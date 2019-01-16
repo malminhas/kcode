@@ -16,6 +16,18 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return events.APIGatewayProxyResponse{}, err
 	}
 
+	/*
+	From: https://docs.aws.amazon.com/lambda/latest/dg/with-on-demand-https-create-package.html#with-apigateway-example-deployment-pkg-go
+	func handleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+    		fmt.Printf("Processing request data for request %s.\n", request.RequestContext.RequestId)
+    		fmt.Printf("Body size = %d.\n", len(request.Body))
+    		fmt.Println("Headers:")
+		for key, value := range request.Headers {
+        		fmt.Printf("    %s: %s\n", key, value)
+    		}
+    	return events.APIGatewayProxyResponse { Body: request.Body, StatusCode: 200 }, nil
+	}
+	*/
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(index),
