@@ -67,7 +67,7 @@ func validateSubMethod(method string) error {
 	case spellsMethod, blocksMethod, validateMethod:
 		return nil
 	default:
-		return fmt.Errorf("allowed methods are: speels, blocks or validate")
+		return fmt.Errorf("allowed methods are: spells, blocks or validate")
 	}
 }
 
