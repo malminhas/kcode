@@ -24,6 +24,9 @@ const (
 
 var (
 	logger = log.WithField("handler", handlerName)
+	// some error values
+	errInvalidJSONPayload = errors.New("invalid JSON payload")
+	errInvalidSubmethod   = errors.New("allowed methods are: spells, blocks or validate")
 )
 
 func init() {
@@ -67,7 +70,7 @@ func validateSubMethod(method string) error {
 	case spellsMethod, blocksMethod, validateMethod:
 		return nil
 	default:
-		return fmt.Errorf("allowed methods are: spells, blocks or validate")
+		return errInvalidSubmethod
 	}
 }
 
@@ -75,7 +78,7 @@ func validateSubMethod(method string) error {
 func validatePayload(body string) ([]byte, error) {
 	payload := Payload{}
 	if err := json.Unmarshal([]byte(body), &payload); err != nil {
-		return nil, errors.New("invalid JSON payload")
+		return nil, errInvalidJSONPayload
 	}
 	// marshal payload back to JSON bytes for use in kcode.METHODS
 	out, err := json.Marshal(payload)
@@ -89,6 +92,9 @@ func validatePayload(body string) ([]byte, error) {
 func kcodeHandler(input []byte, submethod string) []string {
 	kc := kcode.ExtractKcode(input)
 	spells, blocks := kcode.ProcessKcodeString(kc, submethod == spellsMethod, submethod == blocksMethod, true)
+	// NOTE: if both spells and blocks are just []string,
+	// we can simply append/concat them regardless and return it, like:
+	// `return append(spells, blocks...)`
 	switch submethod {
 	case spellsMethod:
 		return spells
@@ -112,22 +118,26 @@ func router(req Request) (Response, error) {
 	defer funcLogger.Infof("response sent")
 
 	if req.HTTPMethod == "POST" {
+		// get sub-method on POST from "method" querystring parameter
 		submethod := req.QueryStringParameters["method"]
 		if err := validateSubMethod(submethod); err != nil {
 			return makeResponse(http.StatusMethodNotAllowed, err, nil)
 		}
+		// parse and turn string payload to bytes payload and validate it
 		payload, err := validatePayload(req.Body)
 		if err != nil {
 			return makeResponse(http.StatusBadRequest, err, nil)
 		}
+		// result is of either spells or blocks in []string values
 		result := kcodeHandler(payload, submethod)
 		return makeResponse(http.StatusOK, nil, result)
 	}
-	// validate or GET method will currently return just a 200 OK reponse
+	// validate or GET method will currently return just a 200 OK response
 	return testGetRequest(req)
 }
 
 func testGetRequest(req Request) (Response, error) {
+	// FIXME: this is a dummy, please fix me
 	return makeResponse(200, nil, "ok")
 }
 
