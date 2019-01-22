@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"reflect"
+
 	kcode "github.com/KanoComputing/go/kcode"
 	log "github.com/sirupsen/logrus"
 
@@ -27,6 +29,7 @@ var (
 	// some error values
 	errInvalidJSONPayload = errors.New("invalid JSON payload")
 	errInvalidSubmethod   = errors.New("allowed methods are: spells, blocks or validate")
+	errInvalidHTTPRequest = errors.New("allowed HTTP requests are: GET, POST")
 )
 
 func init() {
@@ -39,17 +42,13 @@ type Request = events.APIGatewayProxyRequest
 // Response is an alias to the APIGatewayProxyResponse
 type Response = events.APIGatewayProxyResponse
 
-// Payload is the struct of expected payload body from request
-type Payload struct {
-	Method string `json:"method"`
-	Body   string `json:"data"`
-	Count  int    `json:"count"`
-}
-
 func makeResponse(status int, err error, result interface{}) (Response, error) {
 	response := Response{
 		StatusCode: status,
-		Body:       http.StatusText(status),
+		Headers: map[string]string{
+			"Content-Type": "text/html",
+		},
+		Body: http.StatusText(status),
 	}
 	// If there is any errors, include error string representation into the response Body
 	if err != nil {
@@ -74,9 +73,19 @@ func validateSubMethod(method string) error {
 	}
 }
 
+func typeof(v interface{}) string {
+	return reflect.TypeOf(v).String()
+}
+
 // validatePayload validate the payload in string and return a parsed payload bytes alongside any error
 func validatePayload(body string) ([]byte, error) {
-	payload := Payload{}
+	//fmt.Println("---------- body ---------------")
+	//fmt.Println(body)
+	//fmt.Println("---------- body ---------------")
+	//fmt.Println(typeof(body))
+
+	payload := kcode.KCode{}
+	//payload := kcode.KCode{}
 	if err := json.Unmarshal([]byte(body), &payload); err != nil {
 		return nil, errInvalidJSONPayload
 	}
@@ -90,16 +99,27 @@ func validatePayload(body string) ([]byte, error) {
 
 // kcodeHandler will parse input payload and return either spells or blocks
 func kcodeHandler(input []byte, submethod string) []string {
-	kc := kcode.ExtractKcode(input)
-	spells, blocks := kcode.ProcessKcodeString(kc, submethod == spellsMethod, submethod == blocksMethod, true)
+	verbose := false
+	kc, _ := kcode.ExtractKcode(input)
 	// NOTE: if both spells and blocks are just []string,
 	// we can simply append/concat them regardless and return it, like:
 	// `return append(spells, blocks...)`
 	switch submethod {
 	case spellsMethod:
+		spells, _ := kcode.ProcessKcodeString(kc, true, false, verbose)
 		return spells
 	case blocksMethod:
+		_, blocks := kcode.ProcessKcodeString(kc, false, true, verbose)
 		return blocks
+	case validateMethod:
+		expectedSpells, foundSpells, expectedBlocks, foundBlocks, valid := kcode.ValidateBlocksAndSpellsString(kc, verbose)
+		r := []string{}
+		r = append(r, fmt.Sprintf("expectedSpells=%d", expectedSpells))
+		r = append(r, fmt.Sprintf("foundSpells=%d", foundSpells))
+		r = append(r, fmt.Sprintf("expectedBlocks=%d", expectedBlocks))
+		r = append(r, fmt.Sprintf("foundBlocks=%d", foundBlocks))
+		r = append(r, fmt.Sprintf("isValid=%t", valid))
+		return r
 	default:
 		return []string{}
 	}
@@ -109,15 +129,16 @@ func kcodeHandler(input []byte, submethod string) []string {
 func router(req Request) (Response, error) {
 	funcLogger := logger.WithFields(log.Fields{
 		"func":    "router",
-		"mehtod":  req.HTTPMethod,
+		"method":  req.HTTPMethod,
 		"payload": req.Body,
 		"isb64":   req.IsBase64Encoded,
 	})
 	funcLogger.Infof("request received")
 	// defer function will be called before function exits
-	defer funcLogger.Infof("response sent")
+	//defer funcLogger.Infof("response sent")
 
-	if req.HTTPMethod == "POST" {
+	switch req.HTTPMethod {
+	case "POST":
 		// get sub-method on POST from "method" querystring parameter
 		submethod := req.QueryStringParameters["method"]
 		if err := validateSubMethod(submethod); err != nil {
@@ -128,12 +149,15 @@ func router(req Request) (Response, error) {
 		if err != nil {
 			return makeResponse(http.StatusBadRequest, err, nil)
 		}
-		// result is of either spells or blocks in []string values
+		// result is of either "spells" or "blocks" or "validate" in []string values
 		result := kcodeHandler(payload, submethod)
 		return makeResponse(http.StatusOK, nil, result)
+	case "GET":
+		// GET method will currently return just a 200 OK response
+		return testGetRequest(req)
+	default:
+		return makeResponse(http.StatusBadRequest, errInvalidHTTPRequest, "HTTP Request not supported")
 	}
-	// validate or GET method will currently return just a 200 OK response
-	return testGetRequest(req)
 }
 
 func testGetRequest(req Request) (Response, error) {
