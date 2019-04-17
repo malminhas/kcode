@@ -25,11 +25,12 @@ $ go get -v github.com/docopt/docopt-go
 ```
 and also `kcode` itself:
 ```
-$ go get -v github.com/malminhas/kcode
+$ go get -v github.com/malminhas/kcode/kcode/pkg/kcode
 ```
-and build the command line `kcodecli.go` executable as follows:
+and build the command line `kcodecli.go` executable as follows from the 
+cloned source repo:
 ```
-$ go build -ldflags="-s -w" cmd/kcodecli.go
+$ go build -ldflags="-s -w" ./kcode/cmd/kcodecli/kcodecli.go 
 ```
 At this point you should be able to test your install has worked by printing the help output from [kcodecli.go](https://github.com/malminhas/kcode/blob/master/kcode/cmd/kcodecli/kcodecli.go) as follows:
 ```
