@@ -1,6 +1,6 @@
 # kcode analyser
 This repo contains a package to analyse Kano .kcode files.
-[Here](https://github.com/malminhas/kcode/blob/master/GolangNotes.md) are some notes on Golang development.
+[Here](https://github.com/malminhas/kcode/blob/master/GolangNotes.md) are some accompanying notes on Golang development.
 
 ## Overview
 The Golang `kcode` package provides a way to extract spells, blocks, scenes and parts from valid `.kcode` files.  This allows developers to efficiently extract information from `.kcode` data.
