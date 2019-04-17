@@ -25,7 +25,7 @@ $ go get -v github.com/docopt/docopt-go
 ```
 and also `kcode` itself:
 ```
-$ go get -v github.com/malminhas/kcode
+$ go get -v github.com/malminhas/kcode/pkg/kcode
 ```
 and build the command line `kcodecli.go` executable as follows from the 
 cloned source repo:
