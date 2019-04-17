@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	kcode "github.com/malminhas/kcode/kcode/pkg/kcode"
+	kcode "github.com/malminhas/kcode/pkg/kcode"
 	//kcode "../../pkg/kcode"
 	docopt "github.com/docopt/docopt-go"
 )
