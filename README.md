@@ -57,16 +57,16 @@ Examples:
 ## Test
 To run the package test code, make sure you are in the `GOPATH` directory then run tests in [kcode_test.go](https://github.com/malminhas/kcode/tree/master/kcode/pkg/kcode/kcode_test.go) as follows:
 ```
-$ go test kcode
+$ go test ./kcode/pkg/kcode
 ok      kcode   2.085s
 ```
 To run these tests verbosely:
 ```
-$ go test -v kcode
+$ go test -v ./kcode/pkg/kcode
 ```
 To benchmark spell and block extraction over 10 x 70 challenges:
 ```
-$ go test -bench=.
+$ go test -bench=. ./kcode/pkg/kcode 
 ...
       10         176916060 ns/op
 PASS
