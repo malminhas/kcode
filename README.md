@@ -57,7 +57,7 @@ Examples:
 ## Test
 To run the package test code, make sure you are in the `GOPATH` directory then run tests in [kcode_test.go](https://github.com/malminhas/kcode/blob/master/pkg/kcode/kcode_test.go) as follows:
 ```
-$ go test ./kcode/pkg/kcode
+$ go test ./pkg/kcode
 ok      kcode   2.085s
 ```
 To run these tests verbosely:
