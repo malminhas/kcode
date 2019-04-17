@@ -5,9 +5,9 @@ This repo contains a package to analyse Kano .kcode files.
 ## Overview
 The Golang `kcode` package provides a way to extract spells, blocks, scenes and parts from valid `.kcode` files.  This allows developers to efficiently extract information from `.kcode` data.
 The `kcode` package comprises three files:
-* [kcodecli.go](https://github.com/malminhas/kcode/blob/master/kcode/cmd/kcodecli/kcodecli.go): a CLI for working with kcode files.
-* [kcode.go](https://github.com/malminhas/kcode/tree/master/kcode/pkg/kcode/kcode.go): package used by above
-* [kcode_test.go](https://github.com/malminhas/kcode/tree/master/kcode/pkg/kcode/kcode_test.go): test code and benchmarking for [kcode.go](https://github.com/malminhas/kcode/tree/master/kcode/pkg/kcode/kcode.go) package.
+* [kcodecli.go](https://github.com/malminhas/kcode/blob/master/cmd/kcodecli/kcodecli.go): a CLI for working with kcode files.
+* [kcode.go](https://github.com/malminhas/kcode/blob/master/pkg/kcode/kcode.go): package used by above
+* [kcode_test.go](https://github.com/malminhas/kcode/blob/master/pkg/kcode/kcode_test.go): test code and benchmarking for [kcode.go](https://github.com/malminhas/kcode/blob/master/pkg/kcode/kcode.go) package.
 
 ## Installation
 To install this package, you must have a local version of Golang installed.  See [here](https://golang.org/doc/install) for details of how to do this on your host PC. You will now need to set up your `GOPATH` environment variable to point to the directory you will be working from.  It must be a fully-formed path and point to the top level `kcode` source code.  Here's how I did it on my Mac with code git cloned to corresponding repo:
@@ -25,14 +25,14 @@ $ go get -v github.com/docopt/docopt-go
 ```
 and also `kcode` itself:
 ```
-$ go get -v github.com/malminhas/kcode/kcode/pkg/kcode
+$ go get -v github.com/malminhas/kcode
 ```
 and build the command line `kcodecli.go` executable as follows from the 
 cloned source repo:
 ```
-$ go build -ldflags="-s -w" ./kcode/cmd/kcodecli/kcodecli.go 
+$ go build -ldflags="-s -w" ./cmd/kcodecli/kcodecli.go 
 ```
-At this point you should be able to test your install has worked by printing the help output from [kcodecli.go](https://github.com/malminhas/kcode/blob/master/kcode/cmd/kcodecli/kcodecli.go) as follows:
+At this point you should be able to test your install has worked by printing the help output from [kcodecli.go](https://github.com/malminhas/kcode/blob/master/cmd/kcodecli/kcodecli.go) as follows:
 ```
 $ kcodecli
 KCode parser
@@ -55,7 +55,7 @@ Examples:
 ```
 
 ## Test
-To run the package test code, make sure you are in the `GOPATH` directory then run tests in [kcode_test.go](https://github.com/malminhas/kcode/tree/master/kcode/pkg/kcode/kcode_test.go) as follows:
+To run the package test code, make sure you are in the `GOPATH` directory then run tests in [kcode_test.go](https://github.com/malminhas/kcode/blob/master/pkg/kcode/kcode_test.go) as follows:
 ```
 $ go test ./kcode/pkg/kcode
 ok      kcode   2.085s
@@ -74,7 +74,7 @@ ok      kcode   5.749s
 ```
 
 ## Usage
-[kcodecli.go](https://github.com/malminhas/kcode/blob/master/kcode/cmd/kcodecli/kcodecli.go) is a command line interface (CLI) for working with kcode files.  Here are a couple of example commands illustrating how to use them to pull blocks out of `.kcode` files either directly by naming the file or indirectly by naming a directory:
+[kcodecli.go](https://github.com/malminhas/kcode/blob/master/cmd/kcodecli/kcodecli.go) is a command line interface (CLI) for working with kcode files.  Here are a couple of example commands illustrating how to use them to pull blocks out of `.kcode` files either directly by naming the file or indirectly by naming a directory:
 ```
 $ kcodecli blocks src\kcode\challenges\1022_pumpkins.kcode
 Seeking 'blocks' in target .kcode file 'src\kcode\challenges\1022_pumpkins.kcode'...
